@@ -603,13 +603,7 @@ export class Connection {
     args = EJSON.clone(args);
 
     // Lazily allocate method ID once we know that it'll be needed.
-    var methodId = (function() {
-      var id;
-      return function() {
-        if (id === undefined) id = '' + self._nextMethodId++;
-        return id;
-      };
-    })();
+    const methodId = '' + self._nextMethodId++;
 
     var enclosing = DDP._CurrentMethodInvocation.get();
     var alreadyInSimulation = enclosing && enclosing.isSimulation;
@@ -683,7 +677,7 @@ export class Connection {
         var exception = e;
       }
 
-      if (!alreadyInSimulation) self._retrieveAndStoreOriginals(methodId());
+      if (!alreadyInSimulation) self._retrieveAndStoreOriginals(methodId);
     }
 
     // If we're in a simulation, stop and return the result we have,
@@ -745,7 +739,7 @@ export class Connection {
       msg: 'method',
       method: name,
       params: args,
-      id: methodId()
+      id: methodId
     };
 
     // Send the randomSeed only if we used it
@@ -754,7 +748,7 @@ export class Connection {
     }
 
     var methodInvoker = new MethodInvoker({
-      methodId: methodId(),
+      methodId,
       callback: callback,
       connection: self,
       onResultReceived: options.onResultReceived,
